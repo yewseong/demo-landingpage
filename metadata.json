@@ -1,0 +1,6 @@
+{
+  "name": "Apex Grant Strategy",
+  "description": "Secure non-dilutive government funding engineered with Apple-grade precision.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
