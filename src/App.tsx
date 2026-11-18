@@ -38,6 +38,8 @@ export default function App() {
   const [regEmail, setRegEmail] = useState('');
   const [regCompany, setRegCompany] = useState('');
   const [regSubmitted, setRegSubmitted] = useState(false);
+  const [regLoading, setRegLoading] = useState(false);
+  const [regError, setRegError] = useState('');
 
   // Grant Calculator state
   const [calcSector, setCalcSector] = useState('Deep Tech & AI');
@@ -125,10 +127,36 @@ export default function App() {
     }
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!regName || !regEmail) return;
-    setRegSubmitted(true);
+    if (!regName || !regEmail || regLoading) return;
+    setRegLoading(true);
+    setRegError('');
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: regName,
+          email: regEmail,
+          company: regCompany,
+          session: selectedWebinar || '',
+          sector: calcSector,
+          stage: calcStage,
+          fundingTarget: calcFunding
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Registration failed');
+      }
+      setRegSubmitted(true);
+    } catch (err: any) {
+      setRegError(err.message || 'We could not save your registration. Please try again.');
+    } finally {
+      setRegLoading(false);
+    }
   };
 
   return (
@@ -649,11 +677,16 @@ export default function App() {
                   </div>
                 </div>
 
+                {regError && (
+                  <p className="text-xs text-red-400 font-medium">{regError}</p>
+                )}
+
                 <button 
                   type="submit"
-                  className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-colors shadow-lg shadow-blue-600/30"
+                  disabled={regLoading}
+                  className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium text-sm transition-colors shadow-lg shadow-blue-600/30"
                 >
-                  Confirm Free Reservation
+                  {regLoading ? "Saving Your Seat..." : "Confirm Free Reservation"}
                 </button>
               </form>
             ) : (
