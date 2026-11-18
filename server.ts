@@ -97,7 +97,7 @@ app.post("/api/register", async (req, res) => {
 
 async function startServer() {
   const vite = await createViteServer({
-    server: { middlewareMode: true },
+    server: { middlewareMode: true, allowedHosts: ['.ai.studio'] },
     appType: "spa",
   });
 
